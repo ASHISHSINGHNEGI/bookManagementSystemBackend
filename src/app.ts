@@ -14,6 +14,7 @@ import adminRoutes from "./modules/admin/admin.routes";
 const app = express();
 
 // ─── Core Middleware ───────────────────────────────────────────────────────────
+console.log("Allowed Origins:", appConfig.allowedOrigins);
 app.use(
   cors({
     origin: appConfig.allowedOrigins,
