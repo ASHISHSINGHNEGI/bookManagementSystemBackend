@@ -1,23 +1,14 @@
-import winston from 'winston';
-import { appConfig } from '../config/app.config';
-
-const { combine, timestamp, printf, colorize, errors } = winston.format;
-
-const logFormat = printf(({ level, message, timestamp, stack }) => {
-  return `${timestamp} [${level}]: ${stack ?? message}`;
-});
-
-export const logger = winston.createLogger({
-  level: appConfig.isDevelopment ? 'debug' : 'info',
-  format: combine(
-    errors({ stack: true }),
-    timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    appConfig.isDevelopment ? colorize() : winston.format.uncolorize(),
-    logFormat
-  ),
-  transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'logs/combined.log' }),
-  ],
-});
+export const logger = {
+  info: (message: string, meta?: any) => {
+    console.log(`[INFO] ${new Date().toISOString()}: ${message}`, meta ? meta : '');
+  },
+  error: (message: string, meta?: any) => {
+    console.error(`[ERROR] ${new Date().toISOString()}: ${message}`, meta ? meta : '');
+  },
+  warn: (message: string, meta?: any) => {
+    console.warn(`[WARN] ${new Date().toISOString()}: ${message}`, meta ? meta : '');
+  },
+  debug: (message: string, meta?: any) => {
+    console.debug(`[DEBUG] ${new Date().toISOString()}: ${message}`, meta ? meta : '');
+  }
+};
