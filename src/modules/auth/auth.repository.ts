@@ -1,7 +1,8 @@
-import { prisma } from '../../config/database.config';
+import { prisma } from "../../config/database.config";
 
 export const authRepository = {
   findRoleByName: (name: string) => {
+    console.log("authRepository findRoleByName");
     return prisma.role.findUnique({ where: { name } });
   },
 
@@ -31,7 +32,11 @@ export const authRepository = {
     });
   },
 
-  createRefreshToken: (data: { userId: string; token: string; expiresAt: Date }) => {
+  createRefreshToken: (data: {
+    userId: string;
+    token: string;
+    expiresAt: Date;
+  }) => {
     return prisma.refreshToken.create({ data });
   },
 
