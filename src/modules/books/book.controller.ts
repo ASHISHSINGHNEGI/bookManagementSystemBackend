@@ -14,6 +14,7 @@ export const bookController = {
 
   getById: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+      console.log("id: ",req.params.id)
       const data = await bookService.getById(req.params.id);
       sendSuccess(res, 'Book retrieved successfully', data);
     } catch (err) {

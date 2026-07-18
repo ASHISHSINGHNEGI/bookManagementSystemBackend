@@ -1,8 +1,12 @@
-import bcrypt from 'bcrypt';
-import { authRepository } from './auth.repository';
-import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../../utils/jwt.util';
-import { AppError } from '../../errors/AppError';
-import { bcryptConfig, jwtConfig } from '../../config/app.config';
+import bcrypt from "bcrypt";
+import { authRepository } from "./auth.repository";
+import {
+  signAccessToken,
+  signRefreshToken,
+  verifyRefreshToken,
+} from "../../utils/jwt.util";
+import { AppError } from "../../errors/AppError";
+import { bcryptConfig, jwtConfig } from "../../config/app.config";
 
 const getRefreshTokenExpiry = (): Date => {
   // Parse "7d" → 7 days in ms
@@ -26,14 +30,19 @@ export const authService = {
     password: string;
     role?: string;
   }) => {
-    const roleName = data.role ?? 'user';
+    console.log("register service");
+    const roleName = data.role ?? "user";
     const role = await authRepository.findRoleByName(roleName);
     if (!role) throw AppError.badRequest(`Role '${roleName}' does not exist`);
 
     const existing = await authRepository.findUserByEmail(data.email);
-    if (existing) throw AppError.conflict('An account with this email already exists');
+    if (existing)
+      throw AppError.conflict("An account with this email already exists");
 
-    const hashedPassword = await bcrypt.hash(data.password, bcryptConfig.rounds);
+    const hashedPassword = await bcrypt.hash(
+      data.password,
+      bcryptConfig.rounds,
+    );
 
     const user = await authRepository.createUser({
       name: data.name.trim(),
@@ -52,18 +61,25 @@ export const authService = {
     });
 
     return {
-      user: { id: user.id, name: user.name, email: user.email, role: user.role.name },
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role.name,
+      },
       accessToken,
       refreshToken,
     };
   },
 
   login: async (email: string, password: string) => {
-    const user = await authRepository.findUserByEmail(email.toLowerCase().trim());
-    if (!user) throw AppError.unauthorized('Invalid email or password');
+    const user = await authRepository.findUserByEmail(
+      email.toLowerCase().trim(),
+    );
+    if (!user) throw AppError.unauthorized("Invalid email or password");
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) throw AppError.unauthorized('Invalid email or password');
+    if (!isMatch) throw AppError.unauthorized("Invalid email or password");
 
     const accessToken = signAccessToken(user.id, user.role.name);
     const refreshToken = signRefreshToken(user.id);
@@ -75,7 +91,12 @@ export const authService = {
     });
 
     return {
-      user: { id: user.id, name: user.name, email: user.email, role: user.role.name },
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role.name,
+      },
       accessToken,
       refreshToken,
     };
@@ -86,17 +107,19 @@ export const authService = {
     try {
       payload = verifyRefreshToken(token);
     } catch {
-      throw AppError.unauthorized('Invalid or expired refresh token');
+      throw AppError.unauthorized("Invalid or expired refresh token");
     }
 
-    if (payload.type !== 'refresh') throw AppError.unauthorized('Invalid token type');
+    if (payload.type !== "refresh")
+      throw AppError.unauthorized("Invalid token type");
 
     const stored = await authRepository.findRefreshToken(token);
-    if (!stored) throw AppError.unauthorized('Refresh token not found or already revoked');
+    if (!stored)
+      throw AppError.unauthorized("Refresh token not found or already revoked");
 
     if (stored.expiresAt < new Date()) {
       await authRepository.deleteRefreshToken(token);
-      throw AppError.unauthorized('Refresh token has expired');
+      throw AppError.unauthorized("Refresh token has expired");
     }
 
     const user = stored.user;
