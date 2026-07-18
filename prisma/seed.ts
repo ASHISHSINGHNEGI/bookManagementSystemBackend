@@ -68,6 +68,11 @@ async function main() {
   });
   console.log(romance);
 
+  const horror = await prisma.category.create({
+    data: { name: 'Horror', parentId: romance.id },
+  });
+  console.log(horror);
+
   const classic = await prisma.category.create({
     data: { name: 'Classic', parentId: romance.id },
   });
@@ -97,6 +102,17 @@ async function main() {
     data: { name: 'Productivity', parentId: selfHelp.id },
   });
   console.log(productivity);
+
+  const crime = await prisma.category.create({
+    data: { name: 'Crime', parentId: nonFiction.id },
+  });
+  console.log(crime);
+
+  const Thriller = await prisma.category.create({
+    data: { name: 'Thriller', parentId: romance.id },
+  });
+  console.log(Thriller);
+
 
   console.log('✅ Categories seeded');
 
