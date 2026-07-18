@@ -33,7 +33,7 @@ export const categoryRepository = {
       WITH RECURSIVE category_path AS (
         SELECT id, name, parent_id, ARRAY[name::text] AS path
         FROM categories
-        WHERE id = ${categoryId}::uuid
+        WHERE id = ${categoryId}
         UNION ALL
         SELECT c.id, c.name, c.parent_id, ARRAY[c.name::text] || cp.path
         FROM categories c

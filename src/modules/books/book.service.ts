@@ -22,6 +22,8 @@ export const bookService = {
   },
 
   getById: async (id: string) => {
+    console.log("BS id: ", id)
+
     const book = await bookRepository.findById(id);
     if (!book) throw AppError.notFound('Book not found');
 
